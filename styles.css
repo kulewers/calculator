@@ -46,3 +46,8 @@ button {
     font-size: 50px;
     padding: 6px;
 }
+
+.selected {
+    background-color: gray;
+    color: white;
+}
