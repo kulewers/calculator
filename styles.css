@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    font-family: 'Sofia Sans', sans-serif;
 }
 .calculator-body {
     background-color: lightgrey;
@@ -19,6 +20,7 @@ body {
     display: flex;
     justify-content: end;
     align-items: end;
+    border: solid black 1px;
 }
 
 .wrapper {
@@ -34,7 +36,8 @@ button {
     border: 1px solid rgb(150, 150, 150);
     color: black;
     text-align: center;
-    font-size: 16px;
+    font-size: 28px;
+    font-family: 'Sofia Sans', sans-serif;
 }
 
 #num-0 {
@@ -45,6 +48,7 @@ button {
 .screen-content {
     font-size: 50px;
     padding: 6px;
+    font-family: 'Sofia Sans', sans-serif;
 }
 
 .selected {

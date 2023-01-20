@@ -1,0 +1,37 @@
+PSEUDO CODE
+
+liquidNumber is set to true by default
+
+NUMBERS
+entering number 0 keeps the liquidNumber variable
+when liquidNumber is true, clear the screen and set liquidNumber to false
+when liquidNumber is false, when pressed, fill in the screen with numbers
+set clear button mode to C
+
+CLEAR
+when set to AC mode, clear memory, screen and operator, set liquidNumber to it's default position
+when set to C mode, set the screen value to 0 and liquidNumber to true and set clear button mode to AC
+
+ERASE
+return when liquidNumber is set to true
+check if the screen number is 1 digit only
+     if true, set screen to 0 and liquidNumber to true
+     else, remove 1 number from screen
+
+OPERATORS
+when pressed, put the number on screen to memory, leave it on screen, but put liquidNumber to true
+when liquidNumber is set to false, calculate the expression and assign new operator
+     else change the operator
+
+EQUALS
+when there is no number in memory repeat last action with the number on screen
+when there is number in memory, output the result to screen and free the memory
+
+DECIMAL POINT
+return when there is already a decimal point present
+when liquidNumber is true, set screen value to 0 
+add the decimal point
+set clear button mode to C
+
+NEGATE 
+multiply the screen value by -1
