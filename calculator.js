@@ -166,6 +166,9 @@ function opBtn() {
         internalScreenValue = operate(activeOp, calculatorMemory, internalScreenValue);
         calculatorMemory = internalScreenValue;
         liquidNumber = true;
+        phantomMinus = false;
+        phantomDecimalPoint = false;
+        phantomZeroes = 0;
         activeOp = this.id.substr(0, 3);
         updateScreen();
     }
@@ -200,6 +203,9 @@ eqsBtn.addEventListener('click', function() {
     } else {
         internalScreenValue = operate(activeOp, internalScreenValue, equalsMemory);
     }
+    phantomMinus = false;
+    phantomDecimalPoint = false;
+    phantomZeroes = 0;
     liquidNumber = true;
     updateScreen();
 })
