@@ -8,26 +8,77 @@ const numBtns = document.getElementsByClassName('num-btn');
 const opBtns = document.getElementsByClassName('op-btn');
 
 const screen = document.querySelector('.screen-content');
-screen.textContent = '0';
 
+let internalScreenValue = 0;
+let phantomMinus = false;
+let phantomDecimalPoint = false;
+let phantomZeroes = 0;
 let equalsMemory = null;
 let activeOp = null;
 let calculatorMemory = null;
 let liquidNumber = true;
 // tells if the number on screen is to be overwritten on any number input
 let clBtnMode = 0;
-// 0 for AC, 1 for C
+updateScreen();
+
+function updateScreen() {
+    let displedValue = '';
+    if (phantomMinus) {
+        displedValue += '-';
+    }
+    displedValue += internalScreenValue.toLocaleString();
+    if (phantomDecimalPoint) {
+        displedValue += '.';
+    }
+    for (i = 0; i < phantomZeroes; i++) {
+        displedValue += '0';
+    }
+    screen.textContent = displedValue;
+}
+
 
 function numBtn() {
-    if (screen.textContent === '0' || liquidNumber) {
-        screen.textContent = '';
-        screen.textContent += this.id.substr(4);
-        liquidNumber = false;
-    } else if (!liquidNumber) {
-        screen.textContent += this.id.substr(4);
-    }
     clBtnMode = 1;
     clBtn.textContent = 'C';
+    let appendedDigit = parseInt(this.id.substr(4));
+    if (liquidNumber) {
+        phantomDecimalPoint = false;
+        phantomZeroes = 0;
+        phantomMinus = false;
+    }
+    if (appendedDigit === 0) {
+        if (!Number.isInteger(internalScreenValue) || phantomDecimalPoint) {
+            phantomZeroes += 1;
+            updateScreen();
+            return;
+        } else if (phantomMinus) {
+            return;
+        }
+    }
+    if (liquidNumber || (internalScreenValue === 0 && !phantomDecimalPoint && !phantomZeroes && !phantomMinus) ) {
+        internalScreenValue = appendedDigit;
+    } else {
+        let updatedValue = '';
+        if (phantomMinus) {
+            updatedValue += '-';
+            phantomMinus = false;
+        }
+        updatedValue += String(internalScreenValue);
+        if (phantomDecimalPoint) {
+            updatedValue += '.';
+        }
+        if (phantomZeroes) {
+            updatedValue += '0'.repeat(phantomZeroes)
+            phantomZeroes = 0;
+        }
+        updatedValue += String(appendedDigit);
+        if (appendedDigit) {
+            phantomDecimalPoint = false;
+        }
+        internalScreenValue = parseFloat(updatedValue);
+    }
+    liquidNumber = false;
+    updateScreen();
 }
 
 for (let i = 0; i < numBtns.length; i++) {
@@ -35,50 +86,88 @@ for (let i = 0; i < numBtns.length; i++) {
 }
 
 clBtn.addEventListener('click', function() {
-    if (clBtnMode === 0) {
+    phantomDecimalPoint = false;
+    phantomZeroes = 0;
+    phantomMinus = false;
+    internalScreenValue = 0;
+    liquidNumber = true;
+    if (!clBtnMode) {
         equalsMemory = null;
         activeOp = null;
         calculatorMemory = null;
-        screen.textContent = '0';
-        liquidNumber = true;
     } else {
-        screen.textContent = '0';
-        liquidNumber = true;
         clBtnMode = 0;
         clBtn.textContent = 'AC';
     } 
+    updateScreen();
 })
 
 ersBtn.addEventListener('click', function() {
     if (liquidNumber === true) {
         return;
-    } 
-    if (screen.textContent.length === 1) {
-        screen.textContent = '0';
-    } else {
-        screen.textContent = screen.textContent.substr(0, screen.textContent.length - 1)
     }
-
+    if (phantomZeroes) {
+        phantomZeroes -= 1;
+        updateScreen();
+        return;
+    } else if (phantomDecimalPoint) {
+        phantomDecimalPoint = false;
+        updateScreen();
+        return;
+    } else if (phantomMinus) {
+        phantomMinus = false; 
+        updateScreen();
+        return;
+    } else if (!internalScreenValue) {
+        return;
+    }
+    if (String(internalScreenValue).length === ((internalScreenValue) < 0 ? 2 : 1)) {
+        internalScreenValue = 0;
+        updateScreen();
+        return;
+    }
+    if (!Number.isInteger(internalScreenValue)) {
+        if (internalScreenValue === parseFloat(internalScreenValue.toFixed(1))) {
+            phantomDecimalPoint = true;
+        }
+    }
+    let erasedValue = String(internalScreenValue).substring(0, String(internalScreenValue).length - 1);
+    if (String(parseFloat(erasedValue)).length < erasedValue.length) {
+        let decimalSplit = erasedValue.split('.');
+        phantomZeroes = decimalSplit[1].length;
+        phantomDecimalPoint = true;
+        if (erasedValue[0] === '-') {
+            phantomMinus = true;
+            erasedValue *= -1;
+        }
+    }
+    if (Object.is(erasedValue, -0)) {
+        internalScreenValue = 0;
+        phantomMinus = true;
+    }
+    internalScreenValue = parseFloat(erasedValue);
+    updateScreen();
 })
 
 function opBtn() {
     if (equalsMemory) {
-        calculatorMemory = screen.textContent;
+        calculatorMemory = internalScreenValue;
         equalsMemory = null;
     }
-    if (liquidNumber && calculatorMemory) {
+    if (liquidNumber && !(calculatorMemory === null)) {
         activeOp = this.id.substr(0, 3);
         return;
     }
-    if (!calculatorMemory) {
-        calculatorMemory = screen.textContent;
+    if (calculatorMemory === null) {
+        calculatorMemory = internalScreenValue;
         liquidNumber = true;
         activeOp = this.id.substr(0, 3);
     } else {
-        screen.textContent = operate(activeOp, calculatorMemory, screen.textContent);
-        calculatorMemory = screen.textContent;
+        internalScreenValue = operate(activeOp, calculatorMemory, internalScreenValue);
+        calculatorMemory = internalScreenValue;
         liquidNumber = true;
         activeOp = this.id.substr(0, 3);
+        updateScreen();
     }
 }
 
@@ -104,31 +193,38 @@ function operate(operator, num1, num2) {
 }
 
 eqsBtn.addEventListener('click', function() {
-    if (!calculatorMemory) return;
-    if (!equalsMemory) {
-        equalsMemory = screen.textContent;
-        screen.textContent = operate(activeOp, calculatorMemory, screen.textContent);
+    if (calculatorMemory === null) return;
+    if (equalsMemory === null) {
+        equalsMemory = internalScreenValue;
+        internalScreenValue = operate(activeOp, calculatorMemory, internalScreenValue);
     } else {
-        screen.textContent = operate(activeOp, screen.textContent, equalsMemory);
+        internalScreenValue = operate(activeOp, internalScreenValue, equalsMemory);
     }
     liquidNumber = true;
+    updateScreen();
 })
 
 ptBtn.addEventListener('click', function() {
     if (liquidNumber) {
-        screen.textContent = '0';
-    } 
-    for (let i = 0; i < screen.textContent.length; i++) {
-        if(screen.textContent[i] === '.') {
-            return;
-        }
+        internalScreenValue = 0;
     }
-    screen.textContent += '.';
+    if (Number.isInteger(internalScreenValue)) {
+        phantomDecimalPoint = true;
+    }
     liquidNumber = false;
     clBtnMode = 1;
+    clBtn.textContent = 'C';
+    updateScreen();
 })
 
 ngtBtn.addEventListener('click', function() {
-    screen.textContent = screen.textContent * -1;
+    if (internalScreenValue === 0) {
+        phantomMinus = !phantomMinus;
+        liquidNumber = false;
+        updateScreen();
+        return;
+    } 
+    internalScreenValue *= -1;
+    updateScreen();
 })
 

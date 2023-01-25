@@ -1,0 +1,95 @@
+PSEUDO CODE
+
+liquidNumber is set to true by default
+
+NUMBERS
+entering number 0 keeps the liquidNumber variable
+when liquidNumber is true, clear the screen and set liquidNumber to false
+when liquidNumber is false, when pressed, fill in the screen with numbers
+set clear button mode to C
+
+CLEAR
+when set to AC mode, clear memory, screen and operator, set liquidNumber to it's default position
+when set to C mode, set the screen value to 0 and liquidNumber to true and set clear button mode to AC
+
+ERASE
+return when liquidNumber is set to true
+check if the screen number is 1 digit only
+     if true, set screen to 0 and liquidNumber to true
+     else, remove 1 number from screen
+
+OPERATORS
+when pressed, put the number on screen to memory, leave it on screen, but put liquidNumber to true
+when liquidNumber is set to false, calculate the expression and assign new operator
+     else change the operator
+
+EQUALS
+when there is no number in memory repeat last action with the number on screen
+when there is number in memory, output the result to screen and free the memory
+
+DECIMAL POINT
+return when there is already a decimal point present
+when liquidNumber is true, set screen value to 0 
+add the decimal point
+set clear button mode to C
+
+NEGATE 
+multiply the screen value by -1
+
+
+
+add separate variable for number on screen, which will be of number type, converted to string for display upon screen refresh
+
+negative numbers is most likely a mode
+if expression ends up with a negative number, the mode is turned on
+when pressing negate button, update screen with that numer in negative mode
+when eraser is met with 0 in negative mode, turn it off
+
+append numbers with:
+     youtInt * 10 + (yourInt < 0 ? -yourDigit : yourDigit)
+     but use negative mode instead of 'yourIng < 0'
+
+update screen funtion
+the functoin should take internal screen value and:
+     if negative mode is on, add the minus at the very beginning
+     add comma separators using toLocaleString()
+
+
+phantom zeroes - zeroes that are ignored because the take place after decimal point and are not refleced on the internal value
+add phantom zeroes if isinteger() of a internal screen value is false or there is a phantom decimal point
+
+
+when the number is 0, has no phantom decimal point
+
+
+NUMBERS
+when inputting over 0 or liquidNumber, replace the number with the one being pressed
+if decimal point present, phantom or not, any zero input will be added as phantom zero
+if phantom decimal point and phantom zeroes both active, any input other than zero should reset both and update internal screen value to reflect that
+if phantom decimal point is on, any number but a zero will disable that
+
+if appended value is not zero, it will clear both phantom decimal point and zeroes 
+
+ERASE
+if phantom zero 
+     phantom zero -= 1
+     return
+if phantom decimal point
+     phantom decimal point = false;
+     return
+if internal screen value multiplied by 10 is integer, remove last ditit and add phantom decimal point
+else just remove last digit
+if internal value is zero disable negative mode
+
+
+problem
+-0 will turn to positive number when inputting a digit
+
+possible fixes
+negative button when used on zero will give phantom minus
+
+
+parseFloat('0.00') should be different from '0.00'
+but parseFloat('0.03') should be the same as '0.03'
+
+if String(parseFloat('0.00')).length < '0.00'.length
