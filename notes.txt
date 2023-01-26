@@ -93,3 +93,10 @@ parseFloat('0.00') should be different from '0.00'
 but parseFloat('0.03') should be the same as '0.03'
 
 if String(parseFloat('0.00')).length < '0.00'.length
+
+3.00 -> 3 
+phantomZeroes = 2 
+phantomDecimalPoint = true;
+
+3.600 -> 3.6
+phantomZeroes = 2

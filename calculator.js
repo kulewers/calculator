@@ -121,7 +121,10 @@ ersBtn.addEventListener('click', function() {
     } else if (!internalScreenValue) {
         return;
     }
-    if (String(internalScreenValue).length === ((internalScreenValue) < 0 ? 2 : 1)) {
+    if (String(internalScreenValue).length === ((internalScreenValue < 0) ? 2 : 1)) {
+        if (internalScreenValue < 0) {
+            phantomMinus = true;
+        }
         internalScreenValue = 0;
         updateScreen();
         return;
@@ -132,18 +135,24 @@ ersBtn.addEventListener('click', function() {
         }
     }
     let erasedValue = String(internalScreenValue).substring(0, String(internalScreenValue).length - 1);
-    if (String(parseFloat(erasedValue)).length < erasedValue.length) {
-        let decimalSplit = erasedValue.split('.');
-        phantomZeroes = decimalSplit[1].length;
-        phantomDecimalPoint = true;
-        if (erasedValue[0] === '-') {
-            phantomMinus = true;
-            erasedValue *= -1;
+    let lenDiff = erasedValue.length - String(parseFloat(erasedValue)).length;
+    if (lenDiff) {
+        if (Number.isInteger(parseFloat(erasedValue))) {
+            phantomDecimalPoint = true;
+            if (parseFloat(erasedValue) === -0) {
+                phantomZeroes = lenDiff - 2;
+            } else {
+                phantomZeroes = lenDiff - 1;
+            }
+        } else {
+            phantomZeroes = lenDiff;
         }
     }
-    if (Object.is(erasedValue, -0)) {
+    if (Object.is(parseFloat(erasedValue), -0)) {
         internalScreenValue = 0;
         phantomMinus = true;
+        updateScreen();
+        return;
     }
     internalScreenValue = parseFloat(erasedValue);
     updateScreen();
